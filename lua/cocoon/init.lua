@@ -17,7 +17,7 @@ local Cocoon = {}
 function Cocoon:new()
     self.__index = self
     local cocoon = setmetatable({
-        config = CocoonConfig
+        config = CocoonConfig,
     }, self)
     return cocoon
 end
@@ -40,7 +40,7 @@ function Cocoon:open_window(buf)
         row = math.floor((o.lines - self.config.height) / 2),
         col = math.floor((o.columns - self.config.width) / 2),
         style = "minimal",
-        border = "single"
+        border = "single",
     })
     return win
 end
@@ -56,7 +56,7 @@ function Cocoon:call_terminal_win(script)
         once = true,
         callback = function()
             vim.cmd.startinsert()
-        end
+        end,
     })
     api.nvim_create_autocmd("TermClose", {
         group = CocoonGroup,
@@ -80,7 +80,9 @@ function Cocoon.setup(self, config) -- I don't know whats happening
         self = cocoon
     end
 
-    for _, v in pairs(config) do table.insert(self.config, v) end
+    for _, v in pairs(config) do
+        table.insert(self.config, v)
+    end
 
     return self
 end
