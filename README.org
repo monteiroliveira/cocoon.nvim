@@ -1,0 +1,57 @@
+#+TITLE: Cocoon.nvim (WIP)
+#+AUTHOR: Guilherme Monteiro de Oliveira
+
+Float "terminal" focused on executing scripts inside nvim 
+
+#+NAME: Cocoon main image
+#+CAPTION: Coccon main image example
+#+ATTR_HTML: :aling center
+[[https://raw.githubusercontent.com/monteiroliveira/cocoon.nvim/refs/heads/assets/cocoon_example.png]]
+
+* TABLE OF CONTENTS                                                     :toc:
+- [[#disclamer][DISCLAMER]]
+- [[#instalation][INSTALATION]]
+
+* DISCLAMER
+This repos is in wip, so its not work for complete. Download at your own risk.
+
+I came up with the idea for this plugin when I was building a plugin to iterate with TMUX sessions and would like to run them in VIM. I don't know anything about Lua, so I just tried to implement it from scratch, as an exaggerated way to learn.
+
+* INSTALATION
+From source:
+#+BEGIN_SRC shell
+  git clone https://github.com/monteiroliveira/cocoon.nvim.git
+#+END_SRC
+
+And add this in your nvim config file (init.lua)
+
+#+BEGIN_SRC lua
+  return {
+      name = "cocoon",
+      dir = "$HOME/repos/cocoon.nvim",
+      dev = { true },
+      config = function()
+          local cocoon = require("cocoon")
+          cocoon:setup({})
+
+          vim.keymap.set("n", "<leader>m", function ()
+              cocoon:call_terminal_win("tmuxprjmgr")
+          end)
+      end
+  }
+#+END_SRC
+
+Using [[https://github.com/folke/lazy.nvim][Lazy]]: (not working by now)
+#+BEGIN_SRC lua
+  return {
+     "monteiroliveira/cocoon.nvim",
+     config = function()
+        local cocoon = require("cocoon")
+        cocoon.setup({})
+
+        vim.keymap.set("n", "<leader>m", function ()
+            cocoon:call_terminal_win("tmuxprjmgr")
+        end)
+     end
+  }
+#+END_SRC
