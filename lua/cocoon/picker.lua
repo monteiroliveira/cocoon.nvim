@@ -2,10 +2,6 @@ local buffer = require("cocoon.buffer")
 local window = require("cocoon.window")
 local utils = require("cocoon.utils")
 
----@class __cocoon_picker_opts
----@field win? __cocoon_win_opts
----@field buf? __cocoon_buf_opts
-
 ---@class __cocoon_buf_picker
 ---@field opts table
 ---@field window_mgr __cocoon_win
@@ -39,7 +35,7 @@ function M:pick_new()
     M.window_mgr:create_window_with_buf(M.opts.buf)
 end
 
----@param opts? __cocoon_picker_opts
+---@param opts? __cocoon_opts
 function M.setup(opts)
     if opts then
         M.opts = utils.merge_tables(M.opts, opts)
