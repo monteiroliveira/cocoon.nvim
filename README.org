@@ -26,32 +26,29 @@ From source:
 And add this in your nvim config file (init.lua)
 
 #+BEGIN_SRC lua
-  return {
-      name = "cocoon",
-      dir = "$HOME/repos/cocoon.nvim",
-      dev = { true },
-      config = function()
-          local cocoon = require("cocoon")
-          cocoon:setup({})
+return {
+    name = "cocoon",
+    dir = "$HOME/repos/cocoon.nvim",
+    config = function()
+        local cocoon = require("cocoon").setup({})
 
-          vim.keymap.set("n", "<leader>m", function ()
-              cocoon:call_terminal_win("tmuxprjmgr")
-          end)
-      end
-  }
+        vim.keymap.set("n", "<leader>cpn", function()
+            cocoon.picker:pick_new()
+        end)
+    end
+}
 #+END_SRC
 
 Using [[https://github.com/folke/lazy.nvim][Lazy]]: (not working by now)
 #+BEGIN_SRC lua
-  return {
-     "monteiroliveira/cocoon.nvim",
-     config = function()
-        local cocoon = require("cocoon")
-        cocoon.setup({})
+return {
+    "monteiroliveira/cocoon.nvim",
+    config = function()
+        local cocoon = require("cocoon").setup({})
 
-        vim.keymap.set("n", "<leader>m", function ()
-            cocoon:call_terminal_win("tmuxprjmgr")
+        vim.keymap.set("n", "<leader>cpn", function()
+            cocoon.picker:pick_new()
         end)
-     end
-  }
+    end
+}
 #+END_SRC
