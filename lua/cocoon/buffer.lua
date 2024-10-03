@@ -14,7 +14,7 @@ local BUFFER_ID = 0
 local M = {}
 
 M.opts = {
-    limit = 9
+    limit = 9,
 }
 
 ---@param opts? __cocoon_buf_opts
@@ -52,7 +52,9 @@ end
 ---@param bufnr integer
 function M.is_cocoon_buf(bufnr)
     local set = {}
-    for _, v in pairs(LIST_ACTIVE_BUFFERS) do set[v] = true end
+    for _, v in pairs(LIST_ACTIVE_BUFFERS) do
+        set[v] = true
+    end
     if set[bufnr] then
         return true
     end
@@ -62,7 +64,9 @@ end
 ---@return integer
 function M.buf_list_length()
     local count = 0
-    for _ in pairs(LIST_ACTIVE_BUFFERS) do count = count + 1 end
+    for _ in pairs(LIST_ACTIVE_BUFFERS) do
+        count = count + 1
+    end
     return count
 end
 
@@ -91,8 +95,12 @@ function M._register_buf_autocmds()
         pattern = BUFFER_NAME .. "*",
         once = true,
         callback = function()
-            pcall(vim.api.nvim_buf_delete, M.bufnr, { force = true, unload = true })
-        end
+            pcall(
+                vim.api.nvim_buf_delete,
+                M.bufnr,
+                { force = true, unload = true }
+            )
+        end,
     })
 end
 

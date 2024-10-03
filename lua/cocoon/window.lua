@@ -23,15 +23,15 @@ M.opts = {
 }
 
 M.default_win_config = {
-        relative = "editor",
-        width = M.opts.width,
-        height = M.opts.height,
-        row = math.floor((vim.o.lines - M.opts.height) / 2),
-        col = math.floor((vim.o.columns - M.opts.width) / 2),
-        border = M.opts.border,
-        title = M.opts.title,
-        title_pos = M.opts.title_pos,
-        style = M.opts.style,
+    relative = "editor",
+    width = M.opts.width,
+    height = M.opts.height,
+    row = math.floor((vim.o.lines - M.opts.height) / 2),
+    col = math.floor((vim.o.columns - M.opts.width) / 2),
+    border = M.opts.border,
+    title = M.opts.title,
+    title_pos = M.opts.title_pos,
+    style = M.opts.style,
 }
 
 ---@param opts? __cocoon_win_opts
