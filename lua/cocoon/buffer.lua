@@ -27,7 +27,7 @@ end
 
 ---@return integer | nil
 function M.create()
-    if string.find(BUFFER_NAME, vim.api.nvim_buf_get_name(0)) then
+    if not string.find(vim.api.nvim_buf_get_name(0), BUFFER_NAME) then
         if (BUFFER_ID + 1) <= M.opts.limit then
             BUFFER_ID = BUFFER_ID + 1
             M.bufnr = vim.api.nvim_create_buf(true, true) -- For debug reasons
