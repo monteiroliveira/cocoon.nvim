@@ -27,6 +27,7 @@ end
 function M:pick_first()
     local first_bufnr = buffer.get_first_buf()
     if first_bufnr ~= nil then
+        vim.fn.bufload(first_bufnr)
         M.window_mgr:create_window(first_bufnr)
     end
 end
