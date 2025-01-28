@@ -38,7 +38,8 @@ end
 function M:create_window_with_buf(opts)
     local bufnr = buffer.setup(opts):create()
     if bufnr then
-        return vim.api.nvim_open_win(bufnr, true, M.default_win_config)
+        local winnr = vim.api.nvim_open_win(bufnr, true, M.default_win_config)
+        return winnr
     end
 end
 

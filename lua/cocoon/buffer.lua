@@ -26,7 +26,8 @@ function M.create()
 
             M:_set_buf_name(bufnr)
             M:_register_buf_keymaps(bufnr)
-            M:_register_buf_autocmds()
+            M:_register_buf_options(bufnr)
+            M:_register_buf_autocmds(bufnr)
 
             table.insert(LIST_ACTIVE_BUFFERS, bufnr)
 
@@ -77,7 +78,7 @@ end
 function M:_register_buf_keymaps(bufnr)
     local opts = { buffer = bufnr, silent = true, noremap = true }
     vim.keymap.set("n", "q", function()
-        vim.api.nvim_buf_delete(bufnr, { force = true, unload = true })
+        vim.api.nvim_buf_delete(bufnr, { unload = true })
     end, opts)
 
     vim.keymap.set("n", "<C-k>", function()
@@ -89,16 +90,17 @@ end
 function M:_register_buf_autocmds(bufnr)
     local cocoon_pattern = BUFFER_NAME .. "*"
     vim.api.nvim_create_autocmd("BufLeave", {
-        group = augroup,
+        once = true,
         pattern = cocoon_pattern,
-        callback = function()
-            pcall(
-                vim.api.nvim_buf_delete,
-                vim.api.nvim_win_get_buf(0),
-                { force = true, unload = true }
-            )
+        callback = function() -- Unload buffer if leaving (C-k delete the buffer)
+            vim.api.nvim_buf_delete(bufnr, { unload = true })
         end,
     })
+end
+
+function M:_register_buf_options(bufnr)
+    vim.api.nvim_set_option_value("buftype", "nofile", { buf = bufnr })
+    vim.api.nvim_set_option_value("filetype", "cocoon", { buf = bufnr })
 end
 
 return M
