@@ -5,18 +5,12 @@ local LIST_ACTIVE_BUFFERS = {}
 local BUFFER_NAME = "__coccon_buf__"
 local BUFFER_ID = 0
 
----@class __cocoon_buf_opts
----@field limit integer
-
----@class __cocoon_buf
----@field opts __cocoon_buf_opts
 local M = {}
 
 M.opts = {
     limit = 9,
 }
 
----@param opts? __cocoon_buf_opts
 function M.setup(opts)
     if opts then
         M.opts = utils.merge_tables(M.opts, opts)
@@ -24,7 +18,6 @@ function M.setup(opts)
     return M
 end
 
----@return integer | nil
 function M.create()
     if not string.find(vim.api.nvim_buf_get_name(0), BUFFER_NAME) then
         if (BUFFER_ID + 1) <= M.opts.limit then
@@ -42,14 +35,11 @@ function M.create()
     end
 end
 
----@param bufnr integer
 function M:_set_buf_name(bufnr)
     local name = BUFFER_NAME .. BUFFER_ID
     vim.api.nvim_buf_set_name(bufnr, name)
 end
 
----@return boolean
----@param bufnr integer
 function M.is_cocoon_buf(bufnr)
     local set = {}
     for _, v in pairs(LIST_ACTIVE_BUFFERS) do
@@ -61,7 +51,6 @@ function M.is_cocoon_buf(bufnr)
     return false
 end
 
----@return integer
 function M.buf_list_length()
     local count = 0
     for _ in pairs(LIST_ACTIVE_BUFFERS) do
@@ -70,14 +59,12 @@ function M.buf_list_length()
     return count
 end
 
----@return integer | nil
 function M.get_first_buf()
     if M.buf_list_length() > 0 then
         return LIST_ACTIVE_BUFFERS[1]
     end
 end
 
----@return nil
 function M:_remove_buf_from_list(bufnr)
     if not bufnr then return nil end
     for i, v in ipairs(LIST_ACTIVE_BUFFERS) do
@@ -87,8 +74,6 @@ function M:_remove_buf_from_list(bufnr)
     end
 end
 
----@return nil
----@param bufnr integer
 function M:_register_buf_keymaps(bufnr)
     local opts = { buffer = bufnr, silent = true, noremap = true }
     vim.keymap.set("n", "q", function()
@@ -101,8 +86,7 @@ function M:_register_buf_keymaps(bufnr)
     end, opts)
 end
 
----@return nil
-function M:_register_buf_autocmds()
+function M:_register_buf_autocmds(bufnr)
     local cocoon_pattern = BUFFER_NAME .. "*"
     vim.api.nvim_create_autocmd("BufLeave", {
         group = augroup,
