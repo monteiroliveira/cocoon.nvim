@@ -1,6 +1,7 @@
 local buffer = require("cocoon.buffer")
 local window = require("cocoon.window")
 local utils = require("cocoon.utils")
+local proc = require("cocoon.proc")
 
 local M = {}
 
@@ -29,7 +30,10 @@ function M:pick_first()
 end
 
 function M:pick_new()
-    M.window_mgr:create_window_with_buf(M.opts.buf)
+    local bufnr, winrn = M.window_mgr:create_window_with_buf(M.opts.buf)
+    if bufnr then
+        proc.create_term_session(bufnr, vim.o.shell)
+    end
 end
 
 function M.setup(opts)
