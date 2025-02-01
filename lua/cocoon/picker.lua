@@ -1,10 +1,8 @@
 local buffer = require("cocoon.buffer")
 local window = require("cocoon.window")
 local utils = require("cocoon.utils")
+local proc = require("cocoon.proc")
 
----@class __cocoon_buf_picker
----@field opts table
----@field window_mgr __cocoon_win
 local M = {}
 
 M.opts = {}
@@ -17,7 +15,6 @@ function M:unpick()
     end
 end
 
----@param bufnr integer
 function M:pick(bufnr)
     if buffer.is_cocoon_buf(bufnr) then
         M.window_mgr:create_window(bufnr)
@@ -27,15 +24,18 @@ end
 function M:pick_first()
     local first_bufnr = buffer.get_first_buf()
     if first_bufnr ~= nil then
+        vim.fn.bufload(first_bufnr)
         M.window_mgr:create_window(first_bufnr)
     end
 end
 
 function M:pick_new()
-    M.window_mgr:create_window_with_buf(M.opts.buf)
+    local bufnr, winrn = M.window_mgr:create_window_with_buf(M.opts.buf)
+    if bufnr then
+        proc.create_term_session(bufnr, vim.o.shell)
+    end
 end
 
----@param opts? __cocoon_opts
 function M.setup(opts)
     if opts then
         M.opts = utils.merge_tables(M.opts, opts)

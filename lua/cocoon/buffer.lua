@@ -5,19 +5,12 @@ local LIST_ACTIVE_BUFFERS = {}
 local BUFFER_NAME = "__coccon_buf__"
 local BUFFER_ID = 0
 
----@class __cocoon_buf_opts
----@field limit integer
-
----@class __cocoon_buf
----@field name string
----@field bufnr integer
 local M = {}
 
 M.opts = {
     limit = 9,
 }
 
----@param opts? __cocoon_buf_opts
 function M.setup(opts)
     if opts then
         M.opts = utils.merge_tables(M.opts, opts)
@@ -25,31 +18,29 @@ function M.setup(opts)
     return M
 end
 
----@return integer | nil
 function M.create()
     if not string.find(vim.api.nvim_buf_get_name(0), BUFFER_NAME) then
         if (BUFFER_ID + 1) <= M.opts.limit then
             BUFFER_ID = BUFFER_ID + 1
-            M.bufnr = vim.api.nvim_create_buf(true, true) -- For debug reasons
+            local bufnr = vim.api.nvim_create_buf(true, true) -- For debug reasons
 
-            M:_set_buf_name()
-            M:_register_buf_keymaps()
-            M:_register_buf_autocmds()
+            M:_set_buf_name(bufnr)
+            M:_register_buf_keymaps(bufnr)
+            M:_register_buf_options(bufnr)
+            M:_register_buf_autocmds(bufnr)
 
-            table.insert(LIST_ACTIVE_BUFFERS, M.bufnr)
+            table.insert(LIST_ACTIVE_BUFFERS, bufnr)
 
-            return M.bufnr
+            return bufnr
         end
     end
 end
 
-function M:_set_buf_name()
-    M.name = BUFFER_NAME .. BUFFER_ID
-    vim.api.nvim_buf_set_name(M.bufnr, M.name)
+function M:_set_buf_name(bufnr)
+    local name = BUFFER_NAME .. BUFFER_ID
+    vim.api.nvim_buf_set_name(bufnr, name)
 end
 
----@return boolean
----@param bufnr integer
 function M.is_cocoon_buf(bufnr)
     local set = {}
     for _, v in pairs(LIST_ACTIVE_BUFFERS) do
@@ -61,7 +52,6 @@ function M.is_cocoon_buf(bufnr)
     return false
 end
 
----@return integer
 function M.buf_list_length()
     local count = 0
     for _ in pairs(LIST_ACTIVE_BUFFERS) do
@@ -70,38 +60,63 @@ function M.buf_list_length()
     return count
 end
 
----@return integer | nil
 function M.get_first_buf()
     if M.buf_list_length() > 0 then
-        return LIST_ACTIVE_BUFFERS[0]
+        return LIST_ACTIVE_BUFFERS[1]
     end
 end
 
----@return nil
-function M:_register_buf_keymaps()
-    local opts = { buffer = M.bufnr, silent = true, noremap = true }
+function M:_remove_buf_from_list(bufnr)
+    if not bufnr then
+        return nil
+    end
+    for i, v in ipairs(LIST_ACTIVE_BUFFERS) do
+        if v == bufnr then
+            table.remove(LIST_ACTIVE_BUFFERS, i)
+        end
+    end
+end
+
+function M:_register_buf_keymaps(bufnr)
+    local opts = { buffer = bufnr, silent = true, noremap = true }
+    vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", opts)
+
     vim.keymap.set("n", "q", function()
-        vim.api.nvim_buf_delete(M.bufnr, { force = true, unload = true })
+        local windows = vim.fn.win_findbuf(bufnr)
+        local winid = windows[1] -- Dummy + 999999999
+        pcall(vim.api.nvim_win_close, winid, true)
     end, opts)
 
-    vim.keymap.set("n", "<C-k>", function()
-        vim.api.nvim_buf_delete(M.bufnr, { force = true })
+    vim.keymap.set("t", "<C-q>", function()
+        local windows = vim.fn.win_findbuf(bufnr)
+        local winid = windows[1] -- Dummy + 999999999
+        pcall(vim.api.nvim_win_close, winid, true)
+    end, opts)
+
+    vim.keymap.set({ "n", "t" }, "<C-k>", function()
+        local windows = vim.fn.win_findbuf(bufnr)
+        local winid = windows[1] -- Dummy + 999999999
+        pcall(vim.api.nvim_win_close, winid, true)
+        pcall(vim.api.nvim_buf_delete, bufnr, { force = true })
+        M:_remove_buf_from_list(bufnr)
     end, opts)
 end
 
-function M._register_buf_autocmds()
+function M:_register_buf_autocmds(bufnr)
+    local cocoon_pattern = BUFFER_NAME .. "*"
     vim.api.nvim_create_autocmd("BufLeave", {
-        group = augroup,
-        pattern = BUFFER_NAME .. "*",
         once = true,
-        callback = function()
-            pcall(
-                vim.api.nvim_buf_delete,
-                M.bufnr,
-                { force = true, unload = true }
-            )
+        pattern = cocoon_pattern,
+        callback = function() -- Unload buffer if leaving (C-k delete the buffer)
+            vim.api.nvim_buf_delete(bufnr, { unload = true })
         end,
     })
+end
+
+function M:_register_buf_options(bufnr)
+    local opts = { buf = bufnr }
+    vim.api.nvim_set_option_value("buftype", "nofile", opts)
+    vim.api.nvim_set_option_value("filetype", "cocoon", opts)
 end
 
 return M

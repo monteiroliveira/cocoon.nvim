@@ -1,16 +1,6 @@
 local buffer = require("cocoon.buffer")
 local utils = require("cocoon.utils")
 
----@class __cocoon_win_opts
----@field title string
----@field title_pos string
----@field width integer
----@field height integer
----@field border string
----@field style string
-
----@class __cocoon_win
----@field opts __cocoon_win_opts
 local M = {}
 
 M.opts = {
@@ -34,7 +24,6 @@ M.default_win_config = {
     style = M.opts.style,
 }
 
----@param opts? __cocoon_win_opts
 function M.setup(opts)
     if opts then
         M.opts = utils.merge_tables(M.opts, opts)
@@ -42,18 +31,15 @@ function M.setup(opts)
     return M
 end
 
----@return integer
----@param bufnr integer
 function M:create_window(bufnr)
     return vim.api.nvim_open_win(bufnr, true, M.default_win_config)
 end
 
----@return integer | nil
----@param opts? __cocoon_buf_opts
 function M:create_window_with_buf(opts)
     local bufnr = buffer.setup(opts):create()
     if bufnr then
-        return vim.api.nvim_open_win(bufnr, true, M.default_win_config)
+        local winrn = vim.api.nvim_open_win(bufnr, true, M.default_win_config)
+        return bufnr, winrn
     end
 end
 
